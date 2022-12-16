@@ -151,12 +151,7 @@ def train_bert_clf(train_df_collection):
     loss = tf.keras.losses.BinaryCrossentropy(from_logits=True)
     metrics = tf.metrics.BinaryAccuracy()
 
-    init_lr = 3e-5
-    optimizer = optimization.create_optimizer(init_lr=init_lr,
-                                            num_train_steps=1000,
-                                            num_warmup_steps=100,
-                                            optimizer_type='adamw')
-    bert_model.compile(optimizer=optimizer, loss=loss, metrics=metrics)
+    bert_model.compile(optimizer='adam', loss=loss, metrics=metrics)
 
     print('-- TRAIN MODEL --')
     train_metrics_list = []
@@ -204,6 +199,7 @@ def train_models(train_df_collection, models_list, vectorize):
                                                     num_train_steps=1000,
                                                     num_warmup_steps=100,
                                                     optimizer_type='adamw')
+
             bert_model.compile(optimizer=optimizer, loss=loss, metrics=metrics)
 
             trained_model, vectorizer = train(train_df_collection, model, bert_model, vec_type='BERT')
@@ -229,8 +225,9 @@ if __name__ == '__main__':
     train_dataframe_collection = extract_train_chunks(train_data_path)
     class_weights = {0:0.57, 1:3.8}
     models_list = {
-        # 'SGDClassifier': SGDClassifier(loss='log_loss', warm_start=True, class_weight={0:0.58,1:3.8}),
-        'LogisticRegression': LogisticRegression(solver='lbfgs', class_weight='balanced', warm_start=True)
+        'SGDClassifier': SGDClassifier(loss='log_loss', warm_start=True, class_weight={0:0.58,1:3.8}),
+        'LogisticRegression': LogisticRegression(solver='lbfgs', class_weight='balanced', warm_start=True),
+        'SVMClassifier': SGDClassifier(loss='hinge', penalty='l2', class_weight={0:0.57, 1:3.8}, warm_start=True)
     }
     # Train models
     train_models(train_dataframe_collection, models_list, vectorize='Hash')
