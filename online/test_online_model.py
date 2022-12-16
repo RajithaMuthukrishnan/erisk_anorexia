@@ -223,15 +223,23 @@ if __name__ == '__main__':
         for vectorizer_path in vectorizer_files:
             vectorizer_name = (vectorizer_path.split('/')[-1]).split('.')[0]
             if model_name+str('_vectorizer') == vectorizer_name:
-                clf = joblib.load(model_path)
-                # vectorizer = joblib.load(vectorizer_path)
-                if 'BERT' in vectorizer_path:
+
+                if '.h5' in model_path:
+                    clf = tf.keras.models.load_model(
+                        (model_path),
+                        custom_objects={'KerasLayer':hub.KerasLayer}
+                        )
+                elif '.joblib' in model_path:
+                    clf = joblib.load(model_path)
+                    
+                if '.h5' in vectorizer_path:
                     vectorizer = tf.keras.models.load_model(
                         (vectorizer_path),
                         custom_objects={'KerasLayer':hub.KerasLayer}
                         )
-                else:
+                elif '.joblib' in vectorizer_path:
                     vectorizer = joblib.load(vectorizer_path)
+
 
                 print('\n--- '+model_name+' ---')
                 if 'BERT' in model_name:
