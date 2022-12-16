@@ -84,7 +84,8 @@ def test_chunks_predict(model_name, model, vectorizer, vec_type, threshold):
     # Variables for no decisions subjects and their data(aggregated from previous chunks)
     nodec_subjects = np.empty(0)
     nodec_aggregated = pd.DataFrame()
-    
+    print('Predicting ...')
+
     for chunk in range(1,11):
             
         chunk_name = 'chunk'+str(chunk)

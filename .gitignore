@@ -1,4 +1,2 @@
 **/.DS_Store
-online/test_predictions/*.txt
-offline/test_predictions/*.txt
 **/__pycache__
