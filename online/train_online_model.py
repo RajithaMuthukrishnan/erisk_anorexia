@@ -100,12 +100,15 @@ def build_bert_classifier():
     text_input = tf.keras.layers.Input(shape=(), dtype=tf.string, name='text')
     preprocessing_layer = hub.KerasLayer('https://tfhub.dev/tensorflow/bert_en_uncased_preprocess/3', name='preprocessing')
     encoder_inputs = preprocessing_layer(text_input)
-    encoder = hub.KerasLayer('https://tfhub.dev/tensorflow/bert_en_uncased_L-12_H-768_A-12/4', trainable=True, name='BERT_encoder')
+    encoder = hub.KerasLayer('https://tfhub.dev/tensorflow/bert_en_uncased_L-12_H-768_A-12/4', trainable=True)
     outputs = encoder(encoder_inputs)
     net = outputs['pooled_output']
-    net = tf.keras.layers.Dropout(0.1)(net)
-    net = tf.keras.layers.Dense(100, activation=None, name='features')(net)
-    net = tf.keras.layers.Dense(1, activation=None, name='classifier')(net)
+    net = tf.keras.layers.Dense(100, name='features')(net)
+    net = tf.keras.layers.Dense(75)(net)
+    net = tf.keras.layers.Dense(50)(net)
+    net = tf.keras.layers.Dense(25)(net)
+    net = tf.keras.layers.Dense(10)(net)
+    net = tf.keras.layers.Dense(1, activation='sigmoid', name='classifier')(net)
     bert = tf.keras.Model(text_input, net)
     return bert
 
@@ -143,6 +146,42 @@ def train(train_df_collection, model, vectorizer, vec_type):
     train_metrics_df = pd.DataFrame(train_metrics_list, columns=['F1_score'])
     return model, vectorizer
 
+def train_bert_clf(train_df_collection):
+    bert_model = build_bert_classifier()
+    loss = tf.keras.losses.BinaryCrossentropy(from_logits=True)
+    metrics = tf.metrics.BinaryAccuracy()
+
+    init_lr = 3e-5
+    optimizer = optimization.create_optimizer(init_lr=init_lr,
+                                            num_train_steps=1000,
+                                            num_warmup_steps=100,
+                                            optimizer_type='adamw')
+    bert_model.compile(optimizer=optimizer, loss=loss, metrics=metrics)
+
+    print('-- TRAIN MODEL --')
+    train_metrics_list = []
+
+    for chunk in range (len(train_df_collection)):
+        chunk_name = 'chunk'+str(chunk+1)
+        df = data_preparation.preprocess_data(train_df_collection[chunk_name])
+        
+        print('Training ' + chunk_name + '...')
+
+        X_train = df.text
+        Y_train = df.label
+
+        bert_model.fit(X_train, Y_train, class_weight={0:0.5,1:3.8}, epochs=5, verbose=0)
+
+        predictions_probs = bert_model.predict(X_train)
+        predictions = np.where(predictions_probs > 0.5, 1, 0)
+            
+        train_score = f1_score(Y_train, predictions, average='weighted')
+        train_metrics_list.append(train_score)
+        print ('F1 Score :',f1_score(Y_train, predictions, average=None))
+
+    train_metrics_df = pd.DataFrame(train_metrics_list, columns=['F1_score'])
+    bert_model.save('trained_models/BERTClassifier.h5')
+
 def save_model(model, name):
     joblib.dump(model, 'trained_models/'+name+'.joblib')
 
@@ -152,7 +191,7 @@ def save_vectorizer(vectorizer, name):
 def save_vectorizer_bert(vectorizer, name):
     vectorizer.save('trained_models/'+name+'_vectorizer.h5')
 
-def train_models(models_list, vectorize):
+def train_models(train_df_collection, models_list, vectorize):
     for name, model in models_list.items():
         print('     ***** '+ name +' *****    ')
         if vectorize == 'BERT':
@@ -167,13 +206,13 @@ def train_models(models_list, vectorize):
                                                     optimizer_type='adamw')
             bert_model.compile(optimizer=optimizer, loss=loss, metrics=metrics)
 
-            trained_model, vectorizer = train(train_dataframe_collection, model, bert_model, vec_type='BERT')
+            trained_model, vectorizer = train(train_df_collection, model, bert_model, vec_type='BERT')
             model_name = name+'_BERT'
             save_vectorizer_bert(vectorizer, model_name)
 
         if vectorize == 'Hash':
             hasher = HashingVectorizer()
-            trained_model, vectorizer = train(train_dataframe_collection, model, hasher, vec_type='Hash')
+            trained_model, vectorizer = train(train_df_collection, model, hasher, vec_type='Hash')
             model_name = name+'_Hash'
             save_vectorizer(vectorizer, model_name)
 
@@ -187,7 +226,6 @@ if __name__ == '__main__':
 
     train_data_path = args.train_data_path[0]
 
-    bert_preprocesser = hub.KerasLayer('https://tfhub.dev/tensorflow/bert_en_uncased_preprocess/3', name='preprocessing')
     train_dataframe_collection = extract_train_chunks(train_data_path)
     class_weights = {0:0.57, 1:3.8}
     models_list = {
@@ -195,5 +233,6 @@ if __name__ == '__main__':
         'LogisticRegression': LogisticRegression(solver='lbfgs', class_weight='balanced', warm_start=True)
     }
     # Train models
-    # train_models(models_list, vectorize='Hash')
-    train_models(models_list, vectorize='BERT')
+    train_models(train_dataframe_collection, models_list, vectorize='Hash')
+    train_models(train_dataframe_collection, models_list, vectorize='BERT')
+    train_bert_clf(train_dataframe_collection)
