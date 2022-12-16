@@ -72,11 +72,11 @@ def erde_evaluation(goldenTruth_path, algorithmResult_path, o):
 
 
 def calculate_erde(isOnline = True):
-	gpath = '/Users/rajithamuthukrishnan/Desktop/uOttawa/Project_CSI6900/Git/RiskDetection/evaluate/risk-golden-truth-test.csv'
+	gpath = '../evaluate/risk-golden-truth-test.csv'
 	if isOnline:
-		ppath = '/Users/rajithamuthukrishnan/Desktop/uOttawa/Project_CSI6900/Git/RiskDetection/online/test_predictions/usc_global.txt'
+		ppath = '../online/test_predictions/usc_global.txt'
 	else:
-		ppath = '/Users/rajithamuthukrishnan/Desktop/uOttawa/Project_CSI6900/Git/RiskDetection/offline/test_predictions/usc_global.txt'
+		ppath = '../offline/test_predictions/usc_global.txt'
 
 	erde_evaluation(gpath, ppath, o=5)
 	erde_evaluation(gpath, ppath, o=50)

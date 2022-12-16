@@ -68,11 +68,11 @@ def create_aggregated_results(path, wsource, chunks):
 
 def aggregate_chunk_results(isOnline = True):
     if isOnline:
-        path = '/Users/rajithamuthukrishnan/Desktop/uOttawa/Project_CSI6900/Git/RiskDetection/online/test_predictions'
+        path = '../online/test_predictions'
     else:
-        path = '/Users/rajithamuthukrishnan/Desktop/uOttawa/Project_CSI6900/Git/RiskDetection/offline/test_predictions'
+        path = '../offline/test_predictions'
 
-    wsource = '/Users/rajithamuthukrishnan/Desktop/uOttawa/Project_CSI6900/Git/RiskDetection/evaluate/writings-per-subject-all-test.txt'
+    wsource = '../evaluate/writings-per-subject-all-test.txt'
     chunks = 10
     create_aggregated_results(path, wsource, chunks)
 
