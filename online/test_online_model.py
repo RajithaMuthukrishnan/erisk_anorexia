@@ -38,6 +38,7 @@ from official.nlp import optimization
 
 from tensorflow.keras.layers import Dense, Input
 from tensorflow.keras.models import Model
+from tensorflow.keras.optimizers import Adam
 
 import data_preparation
 import sys
@@ -80,7 +81,7 @@ def extract_test_chunks(test_data_path):
         dataframe_collection[chunk_name] = pd.DataFrame(data_list, columns = ['subject_id', 'title', 'text'])
     return dataframe_collection
 
-def test_chunks_predict(model_name, model, vectorizer, vec_type, threshold):
+def test_chunks_predict(model_name, model, vectorizer, vec_type=None, threshold=0.7):
     # Variables for no decisions subjects and their data(aggregated from previous chunks)
     nodec_subjects = np.empty(0)
     nodec_aggregated = pd.DataFrame()
@@ -117,7 +118,10 @@ def test_chunks_predict(model_name, model, vectorizer, vec_type, threshold):
             if chunk==1:
                 # preprocess, vectorize and predict
                 clean_df = data_preparation.preprocess_data(chunk_df)
-                X_test = data_preparation.vectorize_data(clean_df, vectorizer, vec_type=vec_type, isTrainMode=False)
+                if vec_type == None or model_name=='BERTClassifier':
+                    X_test = clean_df.text
+                else:
+                    X_test = data_preparation.vectorize_data(clean_df, vectorizer, vec_type=vec_type, isTrainMode=False)
                 
                 if 'sklearn' in str(type(model)):
                     chunk_prob_classes = model.predict_proba(X_test)
@@ -153,7 +157,11 @@ def test_chunks_predict(model_name, model, vectorizer, vec_type, threshold):
                 # preprocess, vectorize and predict updated text for no decisions
                 clean_df = data_preparation.preprocess_data(nodec_aggregated)
 
-                X_test = data_preparation.vectorize_data(clean_df, vectorizer, vec_type=vec_type, isTrainMode=False)
+                if vec_type == None or model_name=='BERTClassifier':
+                    X_test = clean_df.text
+                else:
+                    X_test = data_preparation.vectorize_data(clean_df, vectorizer, vec_type=vec_type, isTrainMode=False)
+                
                 if 'sklearn' in str(type(model)):
                     nodec_prob_classes = model.predict_proba(X_test)
                 elif 'river' in str(type(model)):
@@ -222,30 +230,39 @@ if __name__ == '__main__':
         model_name = (model_path.split('/')[-1]).split('.')[0]
         for vectorizer_path in vectorizer_files:
             vectorizer_name = (vectorizer_path.split('/')[-1]).split('.')[0]
-            if model_name+str('_vectorizer') == vectorizer_name:
 
-                if '.h5' in model_path:
-                    clf = tf.keras.models.load_model(
-                        (model_path),
-                        custom_objects={'KerasLayer':hub.KerasLayer}
-                        )
-                elif '.joblib' in model_path:
-                    clf = joblib.load(model_path)
-                    
-                if '.h5' in vectorizer_path:
-                    vectorizer = tf.keras.models.load_model(
-                        (vectorizer_path),
-                        custom_objects={'KerasLayer':hub.KerasLayer}
-                        )
-                elif '.joblib' in vectorizer_path:
-                    vectorizer = joblib.load(vectorizer_path)
-
-
+            if model_name == 'BERT_Classifier':
+                clf = tf.keras.models.load_model(
+                            (model_path),
+                            custom_objects={'KerasLayer':hub.KerasLayer}
+                            )
                 print('\n--- '+model_name+' ---')
-                if 'BERT' in model_name:
-                    test_pred_df = test_chunks_predict(model_name, clf, vectorizer, vec_type='BERT', threshold=0.7)
-                else:
-                    test_pred_df = test_chunks_predict(model_name, clf, vectorizer, vec_type='Hash', threshold=0.7)
+                test_pred_df = test_chunks_predict(model_name, clf, vectorizer, threshold=0.7)
+
+            else:
+                if model_name+str('_vectorizer') == vectorizer_name:
+
+                    if '.h5' in model_path:
+                        clf = tf.keras.models.load_model(
+                            (model_path),
+                            custom_objects={'KerasLayer':hub.KerasLayer}
+                            )
+                    elif '.joblib' in model_path:
+                        clf = joblib.load(model_path)
+                        
+                    if '.h5' in vectorizer_path:
+                        vectorizer = tf.keras.models.load_model(
+                            (vectorizer_path),
+                            custom_objects={'KerasLayer':hub.KerasLayer}
+                            )
+                    elif '.joblib' in vectorizer_path:
+                        vectorizer = joblib.load(vectorizer_path)
+
+                    print('\n--- '+model_name+' ---')
+                    if '_BERT' in model_name:
+                        test_pred_df = test_chunks_predict(model_name, clf, vectorizer, vec_type='BERT', threshold=0.7)
+                    else:
+                        test_pred_df = test_chunks_predict(model_name, clf, vectorizer, vec_type='Hash', threshold=0.7)
 
                 test_true_list = []
                 for subject in test_pred_df['subject_id']:
