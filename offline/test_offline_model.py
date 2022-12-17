@@ -254,18 +254,18 @@ if __name__ == '__main__':
 
     for model_path in model_files:
         model_name = (model_path.split('/')[-1]).split('.')[0]
-        for vectorizer_path in vectorizer_files:
-            vectorizer_name = (vectorizer_path.split('/')[-1]).split('.')[0]
 
-            if model_name == 'BERTClassifier':
+        if model_name == 'BERTClassifier':
                 clf = tf.keras.models.load_model(
                             (model_path),
                             custom_objects={'KerasLayer':hub.KerasLayer}
                             )
                 print('\n--- '+model_name+' ---')
                 test_pred_df = test_chunks_predict(model_name, clf, threshold=0.7)
-
-            else:
+        else:
+            for vectorizer_path in vectorizer_files:
+                vectorizer_name = (vectorizer_path.split('/')[-1]).split('.')[0]
+    
                 if model_name+str('_vectorizer') == vectorizer_name:
                     
                     if '.h5' in model_path:
@@ -290,22 +290,22 @@ if __name__ == '__main__':
                     elif '_Hash' in vectorizer_name:
                         test_pred_df = test_chunks_predict(model_name, clf, vectorizer, vec_type='Hash', threshold=0.7)
                 
-            test_true_list = []
-            for subject in test_pred_df['subject_id']:
-                value = test_truth.loc[test_truth['subject_id']==subject]['label'].values[0]
-                value_list = [subject, value]
-                test_true_list.append(value_list)
-            final_test_df = pd.DataFrame(test_true_list, columns=['subject_id', 'label'])
+        test_true_list = []
+        for subject in test_pred_df['subject_id']:
+            value = test_truth.loc[test_truth['subject_id']==subject]['label'].values[0]
+            value_list = [subject, value]
+            test_true_list.append(value_list)
+        final_test_df = pd.DataFrame(test_true_list, columns=['subject_id', 'label'])
 
-            print(classification_report(final_test_df['label'], test_pred_df['pred']))
+        print(classification_report(final_test_df['label'], test_pred_df['pred']))
 
-            # Calculate ERDE 
-            aggregate_chunk_results(isOnline=False)
-            erde_score_5, erde_score_50 = calculate_erde(isOnline=False)
+        # Calculate ERDE 
+        aggregate_chunk_results(isOnline=False)
+        erde_score_5, erde_score_50 = calculate_erde(isOnline=False)
 
-            report_df = get_classification_report(final_test_df['label'], test_pred_df['pred'])
-            report_df = report_df.append(pd.DataFrame([['', '', '', '']], columns=['precision', 'recall', 'f1-score', 'support'], index=['']))
-            report_df = report_df.append(pd.DataFrame([['ERDE o=5', round(erde_score_5, 2), '', '']], columns=['precision', 'recall', 'f1-score', 'support'], index=['']))
-            report_df = report_df.append(pd.DataFrame([['ERDE o=50', round(erde_score_50, 2), '', '']], columns=['precision', 'recall', 'f1-score', 'support'], index=['']))
+        report_df = get_classification_report(final_test_df['label'], test_pred_df['pred'])
+        report_df = report_df.append(pd.DataFrame([['', '', '', '']], columns=['precision', 'recall', 'f1-score', 'support'], index=['']))
+        report_df = report_df.append(pd.DataFrame([['ERDE o=5', round(erde_score_5, 2), '', '']], columns=['precision', 'recall', 'f1-score', 'support'], index=['']))
+        report_df = report_df.append(pd.DataFrame([['ERDE o=50', round(erde_score_50, 2), '', '']], columns=['precision', 'recall', 'f1-score', 'support'], index=['']))
 
-            dfi.export(report_df, 'results/'+model_name+'.png')
+        dfi.export(report_df, 'results/'+model_name+'.png')
