@@ -3,6 +3,7 @@ os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 
 from bs4 import BeautifulSoup 
 import pandas as pd
+import dataframe_image as dfi
 from sklearn.metrics import classification_report
 import matplotlib.pyplot as plt
 import seaborn as sns
@@ -299,10 +300,12 @@ if __name__ == '__main__':
             print(classification_report(final_test_df['label'], test_pred_df['pred']))
 
             # Calculate ERDE 
-            aggregate_chunk_results(isOnline=True)
-            erde_score_5, erde_score_50 = calculate_erde(isOnline=True)
+            aggregate_chunk_results(isOnline=False)
+            erde_score_5, erde_score_50 = calculate_erde(isOnline=False)
 
             report_df = get_classification_report(final_test_df['label'], test_pred_df['pred'])
             report_df = report_df.append(pd.DataFrame([['', '', '', '']], columns=['precision', 'recall', 'f1-score', 'support'], index=['']))
             report_df = report_df.append(pd.DataFrame([['ERDE o=5', round(erde_score_5, 2), '', '']], columns=['precision', 'recall', 'f1-score', 'support'], index=['']))
             report_df = report_df.append(pd.DataFrame([['ERDE o=50', round(erde_score_50, 2), '', '']], columns=['precision', 'recall', 'f1-score', 'support'], index=['']))
+
+            dfi.export(report_df, 'results/'+model_name+'.png')
