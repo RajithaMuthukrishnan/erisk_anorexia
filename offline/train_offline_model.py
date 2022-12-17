@@ -143,6 +143,18 @@ def train(train_df_collection, model, vectorizer, vec_type):
 
 def train_bert_clf(train_df_collection):
     bert_model = build_bert_classifier()
+    text_input = tf.keras.layers.Input(shape=(), dtype=tf.string, name='text')
+    preprocessing_layer = hub.KerasLayer('https://tfhub.dev/tensorflow/bert_en_uncased_preprocess/3', name='preprocessing')
+    encoder_inputs = preprocessing_layer(text_input)
+    encoder = hub.KerasLayer('https://tfhub.dev/tensorflow/bert_en_uncased_L-12_H-768_A-12/4', trainable=True)
+    outputs = encoder(encoder_inputs)
+    net = outputs['pooled_output']
+    net = tf.keras.layers.Dense(100)(net)
+    net = tf.keras.layers.Dense(50)(net)
+    net = tf.keras.layers.Dense(10)(net)
+    net = tf.keras.layers.Dense(1, activation='sigmoid', name='classifier')(net)
+    bert_model = tf.keras.Model(text_input, net)
+
     loss = tf.keras.losses.BinaryCrossentropy(from_logits=True)
     metrics = tf.metrics.BinaryAccuracy()
 
@@ -152,17 +164,16 @@ def train_bert_clf(train_df_collection):
     train_metrics_list = []
 
     train_df = train_df_collection['chunk1']
-    # for chunk in range (1, len(train_df_collection)):
-    #         chunk_name = 'chunk'+str(chunk)
-    #         train_df = train_df.append(train_df_collection[chunk_name])
+    for chunk in range (1, len(train_df_collection)):
+            chunk_name = 'chunk'+str(chunk)
+            train_df = train_df.append(train_df_collection[chunk_name])
 
     df = data_preparation.preprocess_data(train_df)
         
     X_train = df.text
     Y_train = df.label 
 
-    # bert_model.fit(X_train, Y_train, class_weight={0:0.5,1:3.8}, epochs=5, verbose=0)
-    bert_model.fit(X_train, Y_train, class_weight={0:0.5,1:3.8}, epochs=1, verbose=0)
+    bert_model.fit(X_train, Y_train, class_weight={0:0.5,1:3.8}, epochs=5, verbose=0)
     
     predictions_probs = bert_model.predict(X_train)
     predictions = np.where(predictions_probs > 0.5, 1, 0)

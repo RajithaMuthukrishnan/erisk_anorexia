@@ -147,7 +147,19 @@ def train(train_df_collection, model, vectorizer, vec_type):
     return model, vectorizer
 
 def train_bert_clf(train_df_collection):
-    bert_model = build_bert_classifier()
+    
+    text_input = tf.keras.layers.Input(shape=(), dtype=tf.string, name='text')
+    preprocessing_layer = hub.KerasLayer('https://tfhub.dev/tensorflow/bert_en_uncased_preprocess/3', name='preprocessing')
+    encoder_inputs = preprocessing_layer(text_input)
+    encoder = hub.KerasLayer('https://tfhub.dev/tensorflow/bert_en_uncased_L-12_H-768_A-12/4', trainable=True)
+    outputs = encoder(encoder_inputs)
+    net = outputs['pooled_output']
+    net = tf.keras.layers.Dense(100)(net)
+    net = tf.keras.layers.Dense(50)(net)
+    net = tf.keras.layers.Dense(10)(net)
+    net = tf.keras.layers.Dense(1, activation='sigmoid', name='classifier')(net)
+    bert_model = tf.keras.Model(text_input, net)
+
     loss = tf.keras.losses.BinaryCrossentropy(from_logits=True)
     metrics = tf.metrics.BinaryAccuracy()
 
