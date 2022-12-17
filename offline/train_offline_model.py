@@ -158,7 +158,7 @@ def train_bert_clf(train_df_collection):
     loss = tf.keras.losses.BinaryCrossentropy(from_logits=True)
     metrics = tf.metrics.BinaryAccuracy()
 
-    bert_model.compile(optimizer='adam', loss=loss, metrics=metrics)
+    bert_model.compile(optimizer='Adagrad', loss=loss, metrics=metrics)
 
     print('-- TRAIN MODEL --')
     train_metrics_list = []
