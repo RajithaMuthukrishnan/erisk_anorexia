@@ -60,12 +60,10 @@ def erde_evaluation(goldenTruth_path, algorithmResult_path, o):
 			F1 = 2 * (precision * recall) / (precision + recall)
 			erde_global = erde.mean() * 100
 
-			# indiv_erde = merged_data.ix[:,['subj_id','erde']]
 			indiv_erde = merged_data.loc[:,['subj_id','erde']]
 			print ('Global ERDE (with o = %d): %.2f' % (o, erde_global), '%')
-			# print ('F1: %.2f' % F1)
-			# print ('Precision: %.2f' % precision)
-			# print ('Recall: %.2f' % recall)
+
+			return erde_global
 
 		except:
 			print ('Some file or directory doesn\'t exist or an error has occurred')
@@ -78,8 +76,10 @@ def calculate_erde(isOnline = True):
 	else:
 		ppath = '../offline/test_predictions/usc_global.txt'
 
-	erde_evaluation(gpath, ppath, o=5)
-	erde_evaluation(gpath, ppath, o=50)
+	erde_score_5 = erde_evaluation(gpath, ppath, o=5)
+	erde_score_50 = erde_evaluation(gpath, ppath, o=50)
+
+	return erde_score_5, erde_score_50
 
 if __name__ == '__main__':
     calculate_erde()

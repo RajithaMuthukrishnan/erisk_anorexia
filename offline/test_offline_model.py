@@ -214,6 +214,12 @@ def test_chunks_predict(model_name, model, vectorizer=None, vec_type=None, thres
         chunks_pred_df.to_csv(file_name, header=None, index=None, sep='\t', mode='w')    
     return chunks_pred_df
 
+def get_classification_report(y_test, y_pred):
+    report = classification_report(y_test, y_pred, output_dict=True)
+    df_classification_report = pd.DataFrame(report).transpose()
+    df_classification_report.iloc[:,3] = df_classification_report.iloc[:,3].round(decimals=0)
+    df_classification_report.iloc[:,0:3] = df_classification_report.iloc[:,0:3].round(decimals=2)
+    return df_classification_report
 
 def extract_models(path):
     model_files = []
@@ -294,4 +300,9 @@ if __name__ == '__main__':
 
             # Calculate ERDE 
             aggregate_chunk_results(isOnline=True)
-            calculate_erde(isOnline=True)
+            erde_score_5, erde_score_50 = calculate_erde(isOnline=True)
+
+            report_df = get_classification_report(final_test_df['label'], test_pred_df['pred'])
+            report_df = report_df.append(pd.DataFrame([['', '', '', '']], columns=['precision', 'recall', 'f1-score', 'support'], index=['']))
+            report_df = report_df.append(pd.DataFrame([['ERDE o=5', round(erde_score_5, 2), '', '']], columns=['precision', 'recall', 'f1-score', 'support'], index=['']))
+            report_df = report_df.append(pd.DataFrame([['ERDE o=50', round(erde_score_50, 2), '', '']], columns=['precision', 'recall', 'f1-score', 'support'], index=['']))
