@@ -1,54 +1,41 @@
 import os
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3' 
+import sys
 import argparse
-
 from bs4 import BeautifulSoup 
 import pandas as pd
 import dataframe_image as dfi
-from sklearn.metrics import classification_report
 import matplotlib.pyplot as plt
 import seaborn as sns
 import numpy as np
-from tensorflow import keras
 import re
 import joblib 
 
-from gensim.parsing.preprocessing import remove_stopwords
-
-from sklearn.metrics import f1_score
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.utils import class_weight
+from sklearn.metrics import f1_score, classification_report
 from sklearn.feature_extraction.text import HashingVectorizer
-from sklearn.utils.class_weight import compute_class_weight
-
-from nltk.tokenize import sent_tokenize, word_tokenize
-from nltk.stem import WordNetLemmatizer
+from sklearn.linear_model import LogisticRegression
 
 from river import imblearn, optim
 from river import compose, linear_model, metrics, preprocessing
 from river.compat import convert_sklearn_to_river
 
-import warnings
-warnings.filterwarnings('ignore')
-
+from tensorflow import keras
 import tensorflow as tf
 import tensorflow_hub as hub
 import tensorflow_text as text
 from official.nlp import optimization
-
-
 from tensorflow.keras.layers import Dense, Input
 from tensorflow.keras.models import Model
 from tensorflow.keras.optimizers import Adam
 
+import warnings
+warnings.filterwarnings('ignore')
+
 import data_preparation
-import sys
-
-SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
-sys.path.append(os.path.dirname(SCRIPT_DIR))
-
 from evaluate.aggregate_results import aggregate_chunk_results
 from evaluate.erisk_eval import calculate_erde
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+sys.path.append(os.path.dirname(SCRIPT_DIR))
 
 def extract_test_filenames(path):
     files = [] 

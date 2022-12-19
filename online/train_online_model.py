@@ -1,33 +1,26 @@
 import os
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3' 
 from bs4 import BeautifulSoup 
 import pandas as pd
-from sklearn.metrics import classification_report
 import matplotlib.pyplot as plt
 import seaborn as sns
 import numpy as np
 from tensorflow import keras
 import re
 import joblib 
-os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3' 
 import argparse
 
-from gensim.parsing.preprocessing import remove_stopwords
-
 from sklearn.linear_model import SGDClassifier
-from sklearn.metrics import f1_score
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.utils import class_weight
-from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.metrics import f1_score, classification_report
 from sklearn.feature_extraction.text import HashingVectorizer
-from sklearn.utils.class_weight import compute_class_weight
 from sklearn.linear_model import LogisticRegression
 
+import tensorflow as tf
+import tensorflow_hub as hub
+import tensorflow_text as text
+from official.nlp import optimization
 from tensorflow.keras.layers import Dense, Input
 from tensorflow.keras.models import Model
-
-
-from nltk.tokenize import sent_tokenize, word_tokenize
-from nltk.stem import WordNetLemmatizer
 
 from river import imblearn, optim
 from river import compose, linear_model, metrics, preprocessing
@@ -35,11 +28,6 @@ from river.compat import convert_sklearn_to_river
 
 import warnings
 warnings.filterwarnings('ignore')
-
-import tensorflow as tf
-import tensorflow_hub as hub
-import tensorflow_text as text
-from official.nlp import optimization
 
 import data_preparation 
 

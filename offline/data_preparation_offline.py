@@ -1,41 +1,23 @@
-import os
-from bs4 import BeautifulSoup 
-import pandas as pd
-from sklearn.metrics import classification_report
-import matplotlib.pyplot as plt
-import seaborn as sns
 import numpy as np
-from tensorflow import keras
+import pandas as pd
 import re
-import joblib 
 
 from gensim.parsing.preprocessing import remove_stopwords
-
-from sklearn.linear_model import SGDClassifier
-from sklearn.metrics import f1_score
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.utils import class_weight
-from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.feature_extraction.text import HashingVectorizer
-from sklearn.utils.class_weight import compute_class_weight
-
-from nltk.tokenize import sent_tokenize, word_tokenize
+from nltk.tokenize import word_tokenize
 from nltk.stem import WordNetLemmatizer
 
-from tensorflow.keras.layers import Dense, Input
-from tensorflow.keras.models import Model
+from sklearn.feature_extraction.text import HashingVectorizer
 
-from river import imblearn, optim
-from river import compose, linear_model, metrics, preprocessing
-from river.compat import convert_sklearn_to_river
-
-import warnings
-warnings.filterwarnings('ignore')
-
+from tensorflow import keras
 import tensorflow as tf
 import tensorflow_hub as hub
 import tensorflow_text as text
+from tensorflow.keras.layers import Dense, Input
+from tensorflow.keras.models import Model
 from official.nlp import optimization
+
+import warnings
+warnings.filterwarnings('ignore')
 
 def stemSentence(sentence):
     lemmatizer=WordNetLemmatizer()
