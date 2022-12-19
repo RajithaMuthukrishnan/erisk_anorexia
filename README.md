@@ -34,6 +34,10 @@ cd online/results
 ## DATA
 The dataset for the [CLEF erisk 2019](https://erisk.irlab.org/2019/index.html) challenge is used for this implementation.
 
+## PREREQUISITES
+The dataset can be requested from the CLEF eRisk 2019 authors, only for research purposes. - To use this code for training, train and test dataset has to be acquired. 
+- To evaluate the models in this repository, the golden truths and writings per subject files must be attached to the folder 'evaluate'.   
+
 ## INSTALL REQUIREMENTS
 ```sh
 pip install -r requirements.txt
@@ -54,7 +58,6 @@ python test_online_model.py -data <path_to_test_data_chunks>
 ```
 
 ## TRAINING
-Requirement: Train and Test data chunks
 ### Offline Models (Single Batch Training)
 ```sh
 cd offline
