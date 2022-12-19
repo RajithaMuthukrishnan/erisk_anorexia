@@ -1,4 +1,4 @@
-# Early Detection of Anorexia based on Social Media Comments using Incremental Learning
+# Early Detection of Signs of Anorexia based on Social Media Comments using Incremental Learning
 
 Social media comments have the potential to expose various user behaviors. Anorexia is one such condition that can be noticed from the content posted by the affected individuals. This project concentrates on leveraging machine and deep learning models to automatically detect the signs of anorexia based on social media comments, focusing on the behavior of the users. 
 
