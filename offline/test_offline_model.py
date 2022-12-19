@@ -39,6 +39,8 @@ from official.nlp import optimization
 
 from tensorflow.keras.layers import Dense, Input
 from tensorflow.keras.models import Model
+from tensorflow.keras.optimizers import Adam
+
 
 import data_preparation_offline as data_preparation
 import sys
@@ -122,7 +124,6 @@ def test_chunks_predict(model_name, model, vectorizer=None, vec_type=None, thres
                     X_test = clean_df.text
                 else:
                     X_test = data_preparation.vectorize_data(clean_df, vectorizer, vec_type=vec_type, isTrainMode=False)
-                                
                 if 'sklearn' in str(type(model)):
                     chunk_prob_classes = model.predict_proba(X_test)
                 elif 'river' in str(type(model)):

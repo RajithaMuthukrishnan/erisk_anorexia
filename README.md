@@ -9,7 +9,7 @@ Analyzing social media comments to comprehend user behaviors is an ongoing proce
 >> [1] Losada, David &amp; Crestani, Fabio &amp; Parapar, Javier. (2019). Overview of eRisk 2019 Early Risk Prediction on the Internet. 10.1007/978-3-030-28577-7_27.
 
 This implementation includes training the following models
-- SGDClassifier with log_loss
+- SGDClassifier with modified huber loss
 - Logistic Regression
 - Support Vector Classifier
 - BERT Classifier

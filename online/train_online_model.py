@@ -237,7 +237,7 @@ if __name__ == '__main__':
     train_dataframe_collection = extract_train_chunks(train_data_path)
     class_weights = {0:0.57, 1:3.8}
     models_list = {
-        'SGDClassifier': SGDClassifier(loss='log_loss', warm_start=True, class_weight={0:0.58,1:3.8}),
+        'SGDClassifier': SGDClassifier(loss='modified_huber', warm_start=True, class_weight={0:0.58,1:3.8}),
         'LogisticRegression': LogisticRegression(solver='lbfgs', class_weight='balanced', warm_start=True),
         'SVMClassifier': SGDClassifier(loss='hinge', penalty='l2', class_weight={0:0.57, 1:3.8}, warm_start=True)
     }

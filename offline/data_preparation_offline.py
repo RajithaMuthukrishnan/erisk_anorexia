@@ -106,7 +106,7 @@ def bert_vectorize_data(df, vectorizer, isTrainMode=True):
         vectorizer.fit(df.text, df.label, class_weight={0:0.5,1:3.8}, epochs=5, verbose=0)
         vectroizer_layer = Model(vectorizer.input, outputs=vectorizer.get_layer('features').output)
         data_vectorized = vectroizer_layer.predict(df.text)
-        return data_vectorized, labels, vectorizer
+        return data_vectorized, labels, vectroizer_layer
 
     else:
         data_vectorized = vectorizer.predict(df.text, verbose=0)
