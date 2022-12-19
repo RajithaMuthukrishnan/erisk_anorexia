@@ -35,6 +35,9 @@ cd online/results
 The dataset for the [CLEF erisk 2019](https://erisk.irlab.org/2019/index.html) challenge is used for this implementation.
 
 ## EVALUATION
+
+Note: Online and Offline models with Hashing Vectorizer are available for evaluation. BERT classifiers and models based on BERT feature extraction must be built first and then evaluated. Please refer to the Training section to build BERT-based models.
+
 ### Offline Models (Single Batch Training)
 ```sh
 cd offline
