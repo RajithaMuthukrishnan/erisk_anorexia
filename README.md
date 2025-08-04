@@ -1,6 +1,6 @@
 # Early Detection of Signs of Anorexia based on Social Media Comments using Incremental Learning
 
-Social media comments have the potential to expose various user behaviors. Anorexia is one such condition that can be noticed from the content posted by the affected individuals. This project concentrates on leveraging machine and deep learning models to automatically detect the signs of anorexia based on social media comments, focusing on the behavior of the users. 
+Social media comments have the potential to expose various user behaviors. Anorexia is one such condition that could be noticed from the content posted by the affected individuals. This project concentrates on leveraging machine and deep learning models to automatically detect the signs of anorexia based on social media comments, focusing on the behavior of the users. 
 
 The [CLEF erisk 2019](https://erisk.irlab.org/2019/index.html) challenge focuses on three tasks, one among which is the Early Detection of Signs of Anorexia. The Reddit posts are in chunks for this task to mimic the real-world difference in posting dates and times.
 
